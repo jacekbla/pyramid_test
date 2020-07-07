@@ -396,6 +396,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8f02d586c6eb9f4f8a335fa119b45ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  trajectoryDotPrefab: {fileID: 1770171885580328, guid: f23dd36251d7afb4fac9821c1b16afe8,
+    type: 2}
 --- !u!50 &1246478141
 Rigidbody2D:
   serializedVersion: 4
