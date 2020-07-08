@@ -17,10 +17,11 @@ public class BallController : MonoBehaviour
     private GameObject gameOverPanel;
 
     private const float _MAX_FORCE = 8.0f;
-    private const float _FORCE_INCREMENT = 1.0f;
     private const float _DOT_TIME_STEP = 0.1f;
     private const int _DOTS_COUNT = 20;
 
+    private float _forceIncrementSpeed = 1.0f;
+    private float _forceIncreaseWithLevel = 1.0f;
     private Rigidbody2D _rigidbody;
     private float _force;
     private GameObject[] _trajectoryDots;
@@ -39,8 +40,8 @@ public class BallController : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space) && _force <= _MAX_FORCE)
         {
-            _force += _FORCE_INCREMENT * Time.deltaTime;
-            Debug.Log(_force);
+            _force += _forceIncrementSpeed * Time.deltaTime;
+            //Debug.Log(_force);
 
             for (int i = 0; i < _DOTS_COUNT; i++)
             {
@@ -60,63 +61,29 @@ public class BallController : MonoBehaviour
         }
     }
 
-
-    List<GameObject> currentCollisions = new List<GameObject>();
-
-    //void OnCollisionEnter(Collision col)
-    //{
-
-    //    // Add the GameObject collided with to the list.
-    //    currentCollisions.Add(col.gameObject);
-
-    //    // Print the entire list to the console.
-    //    foreach (GameObject gObject in currentCollisions)
-    //    {
-    //        if (gObject.GetComponent<BoxCollider2D>() == holeCollider)
-    //        {
-    //            Debug.Log("Win");
-    //            _score++;
-    //            scoreText.text = _score.ToString();
-    //            Restart();
-    //            return;
-    //        }
-
-    //    }
-    //    // Print the entire list to the console.
-    //    foreach (GameObject gObject in currentCollisions)
-    //    {
-    //        if (gObject.GetComponent<BoxCollider2D>() == groundCollider)
-    //        {
-    //            gameOverPanel.SetActive(true);
-    //            Debug.Log("Fail");
-    //            _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
-    //            return;
-    //        }
-    //    }
-    //}
-
-    //void OnCollisionExit(Collision col)
-    //{
-    //    // Remove the GameObject collided with from the list.
-    //    currentCollisions.Remove(col.gameObject);
-    //}
-
-
-
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other == holeCollider)
+        Collider2D[] colliderArray = new Collider2D[2];
+        int colliderCount = _rigidbody.OverlapCollider(new ContactFilter2D(), colliderArray);
+
+        Debug.Log(colliderCount);
+
+        if(colliderCount > 1)
         {
-            Debug.Log("Win");
-            _score++;
-            scoreText.text = _score.ToString();
-            Restart();
-            gameOverPanel.SetActive(false);
+            foreach (Collider2D c in colliderArray)
+            {
+                if (c == holeCollider)
+                {
+                    _score++;
+                    _forceIncrementSpeed += _forceIncreaseWithLevel;
+                    scoreText.text = _score.ToString();
+                    Restart();
+                }
+            }
         }
         else if (other == groundCollider)
         {
             gameOverPanel.SetActive(true);
-            Debug.Log("Fail");
             _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
         }
     }
