@@ -7,11 +7,6 @@ public class GUIController : MonoBehaviour
 {
     public void RestartGame()
     {
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-
-    //public void QuitGame()
-    //{
-    //    Application.Quit();
-    //}
 }

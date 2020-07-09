@@ -11,18 +11,13 @@ public class HoleController : MonoBehaviour
     [SerializeField]
     private GameObject flag;
 
-    private float _MAX_X = 9.0f;
-    private float _MIN_X = 5.0f;
+    private float _MAX_X = 8.0f;
+    private float _MIN_X = 0.0f;
 
     void Start ()
     {
         RandomizePosition();
     }
-	
-	void Update ()
-    {
-		
-	}
 
     private void OnTriggerEnter2D(Collider2D other)
     {

@@ -16,12 +16,12 @@ public class BallController : MonoBehaviour
     [SerializeField]
     private GameObject gameOverPanel;
 
-    private const float _MAX_FORCE = 8.0f;
+    private const float _MAX_FORCE = 400.0f;
     private const float _DOT_TIME_STEP = 0.1f;
     private const int _DOTS_COUNT = 20;
 
-    private float _forceIncrementSpeed = 1.0f;
-    private float _forceIncreaseWithLevel = 1.0f;
+    private float _forceIncrementSpeed = 40.0f;
+    private float _forceIncreaseWithLevel = 30.0f;
     private Rigidbody2D _rigidbody;
     private float _force;
     private GameObject[] _trajectoryDots;
@@ -31,8 +31,8 @@ public class BallController : MonoBehaviour
 
     void Start()
     {
+        gameOverPanel.SetActive(false);
         _trajectoryDots = new GameObject[_DOTS_COUNT];
-
         _originalPos = gameObject.transform.position;
         _rigidbody = GetComponent<Rigidbody2D>();
         _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
@@ -43,7 +43,6 @@ public class BallController : MonoBehaviour
         if (Input.GetKey(KeyCode.Space) && _force <= _MAX_FORCE && !_ballThrown)
         {
             _force += _forceIncrementSpeed * Time.deltaTime;
-            //Debug.Log(_force);
 
             for (int i = 0; i < _DOTS_COUNT; i++)
             {
@@ -57,8 +56,7 @@ public class BallController : MonoBehaviour
         if ((Input.GetKeyUp(KeyCode.Space) || _force > _MAX_FORCE) && !_ballThrown)
         {
             _rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
-            //_rigidbody.AddForce(new Vector2(_force, _force));
-            _rigidbody.velocity = new Vector2(_force, _force);
+            _rigidbody.AddForce(new Vector2(_force, _force));
             _ballThrown = true;
         }
     }
@@ -102,10 +100,10 @@ public class BallController : MonoBehaviour
 
     private Vector2 CalculatePosition(float elapsedTime)
     {
-        float x = 0.0f * elapsedTime * elapsedTime * 0.5f + _force * elapsedTime + transform.position.x;
-        float y = -9.81f * elapsedTime * elapsedTime * 0.5f + _force * elapsedTime + transform.position.y;
+        float velocity = (_force / _rigidbody.mass) * Time.fixedDeltaTime;
+        Vector2 outPosition = _rigidbody.gravityScale * Physics2D.gravity * elapsedTime * elapsedTime * 0.5f + new Vector2(velocity * elapsedTime, velocity * elapsedTime) + new Vector2(transform.position.x, transform.position.y);
 
-        return new Vector2(x, y);
+        return outPosition;
     }
 
     private void Restart()
