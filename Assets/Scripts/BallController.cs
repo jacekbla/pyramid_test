@@ -27,18 +27,20 @@ public class BallController : MonoBehaviour
     private GameObject[] _trajectoryDots;
     private int _score;
     private bool _ballThrown = false;
+    private Vector3 _originalPos;
 
     void Start()
     {
         _trajectoryDots = new GameObject[_DOTS_COUNT];
 
+        _originalPos = gameObject.transform.position;
         _rigidbody = GetComponent<Rigidbody2D>();
         _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
     }
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.Space) && _force <= _MAX_FORCE)
+        if (Input.GetKey(KeyCode.Space) && _force <= _MAX_FORCE && !_ballThrown)
         {
             _force += _forceIncrementSpeed * Time.deltaTime;
             //Debug.Log(_force);
@@ -63,28 +65,38 @@ public class BallController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Collider2D[] colliderArray = new Collider2D[2];
-        int colliderCount = _rigidbody.OverlapCollider(new ContactFilter2D(), colliderArray);
-
-        Debug.Log(colliderCount);
-
-        if(colliderCount > 1)
+        if (_ballThrown)
         {
-            foreach (Collider2D c in colliderArray)
+            Collider2D[] colliderArray = new Collider2D[2];
+            int colliderCount = _rigidbody.OverlapCollider(new ContactFilter2D(), colliderArray);
+
+            if (colliderCount > 1)
             {
-                if (c == holeCollider)
+                foreach (Collider2D c in colliderArray)
                 {
-                    _score++;
-                    _forceIncrementSpeed += _forceIncreaseWithLevel;
-                    scoreText.text = _score.ToString();
-                    Restart();
+                    if (c == holeCollider)
+                    {
+                        _score++;
+                        _forceIncrementSpeed += _forceIncreaseWithLevel;
+                        scoreText.text = _score.ToString();
+                        Restart();
+                    }
                 }
             }
-        }
-        else if (other == groundCollider)
-        {
-            gameOverPanel.SetActive(true);
-            _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
+            else if (other == groundCollider)
+            {
+                float bestScore = PlayerPrefs.GetFloat("BestScore");
+                Text[] textArray = gameOverPanel.GetComponentsInChildren<Text>();
+                textArray[1].text = "Score: " + _score;
+                textArray[2].text = "Best: " + bestScore;
+
+                gameOverPanel.SetActive(true);
+                if (_score > bestScore)
+                {
+                    PlayerPrefs.SetFloat("BestScore", _score);
+                }
+                _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
+            }
         }
     }
 
@@ -98,7 +110,7 @@ public class BallController : MonoBehaviour
 
     private void Restart()
     {
-        transform.position = new Vector3(-4.0f, -2.64f, 0.0f);
+        transform.position = _originalPos;
         _force = 0.0f;
         _ballThrown = false;
         _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
