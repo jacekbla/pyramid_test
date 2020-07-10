@@ -16,7 +16,7 @@ public class TrajectoryController : MonoBehaviour
     private float _groundLevel;
 
 
-    public void initialize()
+    public void Initialize()
     {
         _groundLevel = _ground.transform.position.y + _ground.GetComponent<SpriteRenderer>().bounds.size.y / 2;
 
@@ -28,7 +28,7 @@ public class TrajectoryController : MonoBehaviour
         }
     }
 
-    public void draw(float p_mass, float p_gravityScale, float p_force, Vector3 p_initialPos)
+    public void Draw(float p_mass, float p_gravityScale, float p_force, Vector3 p_initialPos)
     {
         for (int i = 0; i < _DOTS_COUNT; i++)
         {
@@ -40,7 +40,7 @@ public class TrajectoryController : MonoBehaviour
         }
     }
 
-    public void hide()
+    public void Hide()
     {
         for (int i = 0; i < _DOTS_COUNT; i++)
         {

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class BallController : MonoBehaviour
 {
     [SerializeField]
-    private GameObject _gameManager;
+    private TrajectoryController _trajectory;
 
     [Header("Colliders")]
     [SerializeField]
@@ -14,33 +14,33 @@ public class BallController : MonoBehaviour
     [SerializeField]
     private BoxCollider2D _holeCollider;
 
-    [Header("UI Elements")]
-    [SerializeField]
-    private Text _scoreText;
-    [SerializeField]
-    private GameObject _gameOverPanel;
+    public delegate void Win();
+    public static event Win onWin;
+
+    public delegate void Fail();
+    public static event Fail onFail;
 
     private const float _MAX_FORCE = 400.0f;
     private const float _FORCE_INCREASE_WITH_LEVEL = 30.0f;
     private const float _INITIAL_FORCE = 50.0f;
-    
-    private TrajectoryController _trajectory;
-    private float _forceIncrementSpeed = 40.0f;
-    private Rigidbody2D _rigidbody;
+    private const float _INITIAL_FORCE_INCREASE = 40.0f;
+
+    private float _forceIncrementSpeed = _INITIAL_FORCE_INCREASE;
     private float _force = _INITIAL_FORCE;
-    private int _score = 0;
     private bool _ballThrown = false;
+    private Rigidbody2D _rigidbody;
     private Vector3 _originalPos;
 
     void Awake()
     {
-        _gameOverPanel.SetActive(false);
-        _originalPos = gameObject.transform.position;
+        _originalPos = transform.position;
         _rigidbody = GetComponent<Rigidbody2D>();
-        _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
-        
-        _trajectory = _gameManager.GetComponent<TrajectoryController>();
-        _trajectory.initialize();
+        _trajectory.Initialize();
+    }
+
+    private void OnEnable()
+    {
+        UIController.onRestart += RestartHard;
     }
 
     void Update()
@@ -48,18 +48,22 @@ public class BallController : MonoBehaviour
         if (Input.GetKey(KeyCode.Space) && _force <= _MAX_FORCE && !_ballThrown)
         {
             _force += _forceIncrementSpeed * Time.deltaTime;
-            _trajectory.draw(_rigidbody.mass, _rigidbody.gravityScale, _force, transform.position);
+            _trajectory.Draw(_rigidbody.mass, _rigidbody.gravityScale, _force, transform.position);
         }
 
         if ((Input.GetKeyUp(KeyCode.Space) || _force > _MAX_FORCE) && !_ballThrown)
         {
-            _rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
             _rigidbody.AddForce(new Vector2(_force, _force));
             _ballThrown = true;
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D p_other)
+    private void OnDisable()
+    {
+        UIController.onRestart -= RestartHard;
+    }
+
+    private void OnCollisionEnter2D(Collision2D p_collision)
     {
         if (_ballThrown)
         {
@@ -72,25 +76,17 @@ public class BallController : MonoBehaviour
                 {
                     if (c == _holeCollider)
                     {
-                        _score++;
+                        onWin();
+
                         _forceIncrementSpeed += _FORCE_INCREASE_WITH_LEVEL;
-                        _scoreText.text = _score.ToString();
                         Restart();
                     }
                 }
             }
-            else if (p_other == _groundCollider)
+            else if (p_collision.collider == _groundCollider)
             {
-                float bestScore = PlayerPrefs.GetFloat("BestScore");
-                Text[] textArray = _gameOverPanel.GetComponentsInChildren<Text>();
-                textArray[1].text = "Score: " + _score;
-                textArray[2].text = "Best: " + bestScore;
+                onFail();
 
-                _gameOverPanel.SetActive(true);
-                if (_score > bestScore)
-                {
-                    PlayerPrefs.SetFloat("BestScore", _score);
-                }
                 _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
             }
         }
@@ -101,7 +97,20 @@ public class BallController : MonoBehaviour
         transform.position = _originalPos;
         _force = _INITIAL_FORCE;
         _ballThrown = false;
-        _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
-        _trajectory.hide();
+        _rigidbody.velocity = Vector2.zero;
+        _rigidbody.angularVelocity = 0.0f;
+        _trajectory.Hide();
+    }
+
+    private void RestartHard()
+    {
+        transform.position = _originalPos;
+        _force = _INITIAL_FORCE;
+        _forceIncrementSpeed = _INITIAL_FORCE_INCREASE;
+        _ballThrown = false;
+        _rigidbody.velocity = Vector2.zero;
+        _rigidbody.angularVelocity = 0.0f;
+        _rigidbody.constraints = RigidbodyConstraints2D.None;
+        _trajectory.Hide();
     }
 }

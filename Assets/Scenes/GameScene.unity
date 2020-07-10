@@ -397,6 +397,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 61819801433186268, guid: e17ea9a1f30c0bb41a9457d97cb7ba43,
+        type: 2}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e17ea9a1f30c0bb41a9457d97cb7ba43, type: 2}
   m_IsPrefabAsset: 0
@@ -515,6 +520,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d288cd55b30232941884802cd1bd115f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gameOverPanel: {fileID: 1331421982}
+  _scoreText: {fileID: 43001363}
 --- !u!4 &646212125
 Transform:
   m_ObjectHideFlags: 0
@@ -770,7 +777,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1331421983
 RectTransform:
   m_ObjectHideFlags: 0
@@ -959,6 +966,16 @@ Prefab:
       propertyPath: _gameManager
       value: 
       objectReference: {fileID: 646212123}
+    - target: {fileID: 114116412467166182, guid: 7b611c7a0ff7e904cba7630e67ded595,
+        type: 2}
+      propertyPath: _trajectory
+      value: 
+      objectReference: {fileID: 646212126}
+    - target: {fileID: 58126666933140364, guid: 7b611c7a0ff7e904cba7630e67ded595,
+        type: 2}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7b611c7a0ff7e904cba7630e67ded595, type: 2}
   m_IsPrefabAsset: 0

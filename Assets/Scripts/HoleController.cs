@@ -14,7 +14,7 @@ public class HoleController : MonoBehaviour
         RandomizePosition();
     }
 
-    private void OnTriggerEnter2D(Collider2D p_other)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         RandomizePosition();
     }
