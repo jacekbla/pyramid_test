@@ -12,6 +12,7 @@ public class UIController : MonoBehaviour
     [SerializeField]
     private Text _scoreText;
 
+    private FileManager _fileManager = new FileManager();
     private int _score = 0;
     
     public delegate void Restart();
@@ -50,7 +51,7 @@ public class UIController : MonoBehaviour
 
     private void gameOverScreen()
     {
-        float bestScore = PlayerPrefs.GetFloat("BestScore");
+        int bestScore = int.Parse(_fileManager.LoadString("highscore.txt"));
         Text[] textArray = _gameOverPanel.GetComponentsInChildren<Text>();
         textArray[1].text = "Score: " + _score;
         textArray[2].text = "Best: " + bestScore;
@@ -58,8 +59,7 @@ public class UIController : MonoBehaviour
 
         if (_score > bestScore)
         {
-            PlayerPrefs.SetFloat("BestScore", _score);
-            PlayerPrefs.Save();
+            _fileManager.SaveString("highscore.txt", _score.ToString());
         }
     }
 }

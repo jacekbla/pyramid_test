@@ -14,9 +14,10 @@ public class HoleController : MonoBehaviour
         RandomizePosition();
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnEnable()
     {
-        RandomizePosition();
+        BallController.onWin += RandomizePosition;
+        UIController.onRestart += RandomizePosition;
     }
 
     private void RandomizePosition()
