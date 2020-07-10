@@ -6,36 +6,41 @@ using UnityEngine.UI;
 public class BallController : MonoBehaviour
 {
     [SerializeField]
-    private GameObject trajectoryDotPrefab;
+    private GameObject _gameManager;
+
+    [Header("Colliders")]
     [SerializeField]
-    private BoxCollider2D groundCollider;
+    private BoxCollider2D _groundCollider;
     [SerializeField]
-    private BoxCollider2D holeCollider;
+    private BoxCollider2D _holeCollider;
+
+    [Header("UI Elements")]
     [SerializeField]
-    private Text scoreText;
+    private Text _scoreText;
     [SerializeField]
-    private GameObject gameOverPanel;
+    private GameObject _gameOverPanel;
 
     private const float _MAX_FORCE = 400.0f;
-    private const float _DOT_TIME_STEP = 0.1f;
-    private const int _DOTS_COUNT = 20;
-
+    private const float _FORCE_INCREASE_WITH_LEVEL = 30.0f;
+    private const float _INITIAL_FORCE = 50.0f;
+    
+    private TrajectoryController _trajectory;
     private float _forceIncrementSpeed = 40.0f;
-    private float _forceIncreaseWithLevel = 30.0f;
     private Rigidbody2D _rigidbody;
-    private float _force;
-    private GameObject[] _trajectoryDots;
-    private int _score;
+    private float _force = _INITIAL_FORCE;
+    private int _score = 0;
     private bool _ballThrown = false;
     private Vector3 _originalPos;
 
-    void Start()
+    void Awake()
     {
-        gameOverPanel.SetActive(false);
-        _trajectoryDots = new GameObject[_DOTS_COUNT];
+        _gameOverPanel.SetActive(false);
         _originalPos = gameObject.transform.position;
         _rigidbody = GetComponent<Rigidbody2D>();
         _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
+        
+        _trajectory = _gameManager.GetComponent<TrajectoryController>();
+        _trajectory.initialize();
     }
 
     void Update()
@@ -43,14 +48,7 @@ public class BallController : MonoBehaviour
         if (Input.GetKey(KeyCode.Space) && _force <= _MAX_FORCE && !_ballThrown)
         {
             _force += _forceIncrementSpeed * Time.deltaTime;
-
-            for (int i = 0; i < _DOTS_COUNT; i++)
-            {
-                Destroy(_trajectoryDots[i]);
-                GameObject trajectoryDot = Instantiate(trajectoryDotPrefab);
-                trajectoryDot.transform.position = CalculatePosition(_DOT_TIME_STEP * i);
-                _trajectoryDots[i] = trajectoryDot;
-            }
+            _trajectory.draw(_rigidbody.mass, _rigidbody.gravityScale, _force, transform.position);
         }
 
         if ((Input.GetKeyUp(KeyCode.Space) || _force > _MAX_FORCE) && !_ballThrown)
@@ -61,7 +59,7 @@ public class BallController : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D p_other)
     {
         if (_ballThrown)
         {
@@ -72,23 +70,23 @@ public class BallController : MonoBehaviour
             {
                 foreach (Collider2D c in colliderArray)
                 {
-                    if (c == holeCollider)
+                    if (c == _holeCollider)
                     {
                         _score++;
-                        _forceIncrementSpeed += _forceIncreaseWithLevel;
-                        scoreText.text = _score.ToString();
+                        _forceIncrementSpeed += _FORCE_INCREASE_WITH_LEVEL;
+                        _scoreText.text = _score.ToString();
                         Restart();
                     }
                 }
             }
-            else if (other == groundCollider)
+            else if (p_other == _groundCollider)
             {
                 float bestScore = PlayerPrefs.GetFloat("BestScore");
-                Text[] textArray = gameOverPanel.GetComponentsInChildren<Text>();
+                Text[] textArray = _gameOverPanel.GetComponentsInChildren<Text>();
                 textArray[1].text = "Score: " + _score;
                 textArray[2].text = "Best: " + bestScore;
 
-                gameOverPanel.SetActive(true);
+                _gameOverPanel.SetActive(true);
                 if (_score > bestScore)
                 {
                     PlayerPrefs.SetFloat("BestScore", _score);
@@ -98,23 +96,12 @@ public class BallController : MonoBehaviour
         }
     }
 
-    private Vector2 CalculatePosition(float elapsedTime)
-    {
-        float velocity = (_force / _rigidbody.mass) * Time.fixedDeltaTime;
-        Vector2 outPosition = _rigidbody.gravityScale * Physics2D.gravity * elapsedTime * elapsedTime * 0.5f + new Vector2(velocity * elapsedTime, velocity * elapsedTime) + new Vector2(transform.position.x, transform.position.y);
-
-        return outPosition;
-    }
-
     private void Restart()
     {
         transform.position = _originalPos;
-        _force = 0.0f;
+        _force = _INITIAL_FORCE;
         _ballThrown = false;
         _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
-        for (int i = 0; i < _DOTS_COUNT; i++)
-        {
-            Destroy(_trajectoryDots[i]);
-        }
+        _trajectory.hide();
     }
 }
