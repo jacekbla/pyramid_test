@@ -1,8 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
+/// <summary>
+/// This class is responsible for preparing, launching and collision detection of the ball 
+/// controlled by player.
+/// It subscribes to method invoked on Restart button click, defined in UIController class.
+/// It contains definitions of events invoked when ball hits the target and when it misses.
+/// Declared const variables control initial and maximum force, initial increase of force 
+/// and the magnitude of that increase.
+/// </summary>
 public class BallController : MonoBehaviour
 {
     [SerializeField]
@@ -14,11 +19,11 @@ public class BallController : MonoBehaviour
     [SerializeField]
     private BoxCollider2D _holeCollider;
 
-    public delegate void Win();
-    public static event Win onWin;
+    public delegate void Hit();
+    public static event Hit onHit;
 
-    public delegate void Fail();
-    public static event Fail onFail;
+    public delegate void Miss();
+    public static event Miss onMiss;
 
     private const float _MAX_FORCE = 400.0f;
     private const float _FORCE_INCREASE_WITH_LEVEL = 30.0f;
@@ -31,7 +36,7 @@ public class BallController : MonoBehaviour
     private Rigidbody2D _rigidbody;
     private Vector3 _originalPos;
 
-    void Awake()
+    private void Awake()
     {
         _originalPos = transform.position;
         _rigidbody = GetComponent<Rigidbody2D>();
@@ -40,10 +45,10 @@ public class BallController : MonoBehaviour
 
     private void OnEnable()
     {
-        UIController.onRestart += RestartHard;
+        UIController.onRestart += Restart;
     }
 
-    void Update()
+    private void Update()
     {
         if (Input.GetKey(KeyCode.Space) && _force <= _MAX_FORCE && !_ballThrown)
         {
@@ -60,7 +65,7 @@ public class BallController : MonoBehaviour
 
     private void OnDisable()
     {
-        UIController.onRestart -= RestartHard;
+        UIController.onRestart -= Restart;
     }
 
     private void OnCollisionEnter2D(Collision2D p_collision)
@@ -76,23 +81,23 @@ public class BallController : MonoBehaviour
                 {
                     if (c == _holeCollider)
                     {
-                        onWin();
+                        onHit();
 
                         _forceIncrementSpeed += _FORCE_INCREASE_WITH_LEVEL;
-                        Restart();
+                        PrepareNextThrow();
                     }
                 }
             }
             else if (p_collision.collider == _groundCollider)
             {
-                onFail();
+                onMiss();
 
                 _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
             }
         }
     }
 
-    private void Restart()
+    private void PrepareNextThrow()
     {
         transform.position = _originalPos;
         _force = _INITIAL_FORCE;
@@ -102,7 +107,7 @@ public class BallController : MonoBehaviour
         _trajectory.Hide();
     }
 
-    private void RestartHard()
+    private void Restart()
     {
         transform.position = _originalPos;
         _force = _INITIAL_FORCE;

@@ -1,7 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+/// <summary>
+/// This class prepares, enables and disables trajectory dots.
+/// Its public methods are called in BallController.
+/// The distance between each dot and their overall count is controlled with const variables.
+/// </summary>
 public class TrajectoryController : MonoBehaviour
 {
     [SerializeField]
@@ -11,7 +14,9 @@ public class TrajectoryController : MonoBehaviour
     
     private const float _DOT_TIME_STEP = 0.1f;
     private const int _DOTS_COUNT = 20;
-    private GameObject[] _trajectoryDots = new GameObject[_DOTS_COUNT];
+
+    private readonly GameObject[] _trajectoryDots = new GameObject[_DOTS_COUNT];
+
     private GameObject _trajectory;
     private float _groundLevel;
 

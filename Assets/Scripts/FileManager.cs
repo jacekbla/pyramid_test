@@ -1,6 +1,10 @@
 ﻿using System.IO;
 using UnityEngine;
 
+/// <summary>
+/// This class is responsible for saving and loading strings to file.
+/// It is used when storing best score achived in the game.
+/// </summary>
 class FileManager
 {
     public void SaveString(string p_fileName, string p_data)

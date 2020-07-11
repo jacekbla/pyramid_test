@@ -1,9 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// This class is responsible for User Interface control.
+/// This includes: game over panel displayed when the ball misses the target
+/// and score counter displayed in upper right corner of the screen.
+/// It subscribes to events invoked when ball hits the target or misses it, defined 
+/// in BallController.
+/// </summary>
 public class UIController : MonoBehaviour
 {
     [Header("UI Elements")]
@@ -11,6 +15,8 @@ public class UIController : MonoBehaviour
     private GameObject _gameOverPanel;
     [SerializeField]
     private Text _scoreText;
+
+    private const string _HIGHSCORE_FILE_NAME = "hightscore.txt";
 
     private FileManager _fileManager = new FileManager();
     private int _score = 0;
@@ -25,8 +31,14 @@ public class UIController : MonoBehaviour
 
     private void OnEnable()
     {
-        BallController.onWin += updateScore;
-        BallController.onFail += gameOverScreen;
+        BallController.onHit += UpdateScore;
+        BallController.onMiss += ShowGameOverScreen;
+    }
+    
+    private void OnDisable()
+    {
+        BallController.onHit -= UpdateScore;
+        BallController.onMiss -= ShowGameOverScreen;
     }
 
     public void RestartGame()
@@ -36,22 +48,16 @@ public class UIController : MonoBehaviour
         _gameOverPanel.SetActive(false);
         _scoreText.text = "0";
     }
-    
-    private void OnDisable()
-    {
-        BallController.onWin -= updateScore;
-        BallController.onFail -= gameOverScreen;
-    }
 
-    private void updateScore()
+    private void UpdateScore()
     {
         _score++;
         _scoreText.text = _score.ToString();
     }
 
-    private void gameOverScreen()
+    private void ShowGameOverScreen()
     {
-        int bestScore = int.Parse(_fileManager.LoadString("highscore.txt"));
+        int bestScore = int.Parse(_fileManager.LoadString(_HIGHSCORE_FILE_NAME));
         Text[] textArray = _gameOverPanel.GetComponentsInChildren<Text>();
         textArray[1].text = "Score: " + _score;
         textArray[2].text = "Best: " + bestScore;
@@ -59,7 +65,7 @@ public class UIController : MonoBehaviour
 
         if (_score > bestScore)
         {
-            _fileManager.SaveString("highscore.txt", _score.ToString());
+            _fileManager.SaveString(_HIGHSCORE_FILE_NAME, _score.ToString());
         }
     }
 }

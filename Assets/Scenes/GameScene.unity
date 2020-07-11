@@ -330,7 +330,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 0.9963192, g: 1, b: 0, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -339,8 +339,8 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 120
-    m_FontStyle: 0
+    m_FontSize: 90
+    m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 120
@@ -397,12 +397,8 @@ Prefab:
       propertyPath: m_RootOrder
       value: 5
       objectReference: {fileID: 0}
-    - target: {fileID: 61819801433186268, guid: e17ea9a1f30c0bb41a9457d97cb7ba43,
-        type: 2}
-      propertyPath: m_IsTrigger
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 114371477435086798, guid: e17ea9a1f30c0bb41a9457d97cb7ba43, type: 2}
   m_SourcePrefab: {fileID: 100100000, guid: e17ea9a1f30c0bb41a9457d97cb7ba43, type: 2}
   m_IsPrefabAsset: 0
 --- !u!1 &519420028
@@ -812,7 +808,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.8754735, b: 1, a: 0.392}
+  m_Color: {r: 0, g: 0.8754735, b: 1, a: 0.78431374}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -876,6 +872,22 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 06920b3e16ce1d04f994eaf927d50c4e, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1 &1513527904 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1861811770170436, guid: e17ea9a1f30c0bb41a9457d97cb7ba43,
+    type: 2}
+  m_PrefabInternal: {fileID: 279539630}
+--- !u!114 &1513527905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1513527904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f4f993a7862ce24c944d52bed673901, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1562397264
 Prefab:
   m_ObjectHideFlags: 0
@@ -971,11 +983,6 @@ Prefab:
       propertyPath: _trajectory
       value: 
       objectReference: {fileID: 646212126}
-    - target: {fileID: 58126666933140364, guid: 7b611c7a0ff7e904cba7630e67ded595,
-        type: 2}
-      propertyPath: m_IsTrigger
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7b611c7a0ff7e904cba7630e67ded595, type: 2}
   m_IsPrefabAsset: 0
