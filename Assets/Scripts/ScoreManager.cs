@@ -4,7 +4,8 @@ using UnityEngine;
 
 /// <summary>
 /// This class is responsible for storing and updating score and highscore.
-/// It stores highscore in persistentDataPath and updates it when called in UIController.
+/// It stores highscore in file located accesed with persistentDataPath and 
+/// updates it when called in UIController.
 /// </summary>
 class ScoreManager
 {
@@ -38,37 +39,52 @@ class ScoreManager
         }
     }
 
+    /// <summary>
+    /// Constructor - loads highscore from file to variable and subscribes to onRestart event.
+    /// </summary>
     public ScoreManager()
     {
-        _highscore = int.Parse(LoadString());
+        _highscore = LoadHighscore();
         UIController.onRestart += ResetScore;
     }
-
+    
+    /// <summary>
+    /// Checks if current score is the new highscore, updates and saves it to file if needed.
+    /// </summary>
+    /// <returns>bool - true when highscore is updated, false otherwise</returns>
     public bool UpdateHighscore()
     {
         if(_score > _highscore)
         {
             _highscore = _score;
-            SaveString(_highscore.ToString());
+            SaveHighscore(_highscore);
             return true;
         }
         return false;
     }
 
+    /// <summary>
+    /// Simple method that resets current score back to 0.
+    /// </summary>
     private void ResetScore()
     {
         _score = 0;
     }
 
-    private void SaveString(string p_data)
+    /// <summary>
+    /// This method tries to save given value in highscore file.
+    /// </summary>
+    /// <param name="p_data">int - highscore value to be stored</param>
+    private void SaveHighscore(int p_data)
     {
         string path = Path.Combine(Application.persistentDataPath, _HIGHSCORE_FILE_NAME);
+        string data = p_data.ToString();
 
         try
         {
             using (StreamWriter writer = new StreamWriter(path, false))
             {
-                writer.Write(p_data);
+                writer.Write(data);
             }
         }
         catch (IOException e)
@@ -77,7 +93,11 @@ class ScoreManager
         }
     }
 
-    private string LoadString()
+    /// <summary>
+    /// This method tries to load data from highscore file.
+    /// </summary>
+    /// <returns>int - highscore from file or _DEFAULT_LOAD_RESULT when it could not be loaded</returns>
+    private int LoadHighscore()
     {
         string path = Path.Combine(Application.persistentDataPath, _HIGHSCORE_FILE_NAME);
         string result = _DEFAULT_LOAD_RESULT;
@@ -86,19 +106,19 @@ class ScoreManager
         {
             if (!File.Exists(path))
             {
-                return result;
+                return int.Parse(result);
             }
 
             using (StreamReader reader = new StreamReader(path))
             {
                 result = reader.ReadToEnd();
             }
-            return result;
+            return int.Parse(result);
         }
         catch (IOException e)
         {
             Debug.LogException(e);
-            return result;
+            return int.Parse(result);
         }
     }
 }

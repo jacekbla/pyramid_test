@@ -2,20 +2,22 @@
 
 /// <summary>
 /// This class ensures the same scene content for different screen aspect ratios.
-/// It it done by changing the orthogonic size of the camera. The empty space 
-/// created this way is filled with sky/lower ground sprites.
+/// It it done by changing the size of the camera. Empty space created this way 
+/// is filled with sky/lower ground sprites.
 /// </summary>
 public class AspectRatioManager : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject _sky;
-
-    [SerializeField]
-    private GameObject _lowerGround;
-
+    [Header("Game Objects")]
     [SerializeField]
     private GameObject _upperGround;
 
+    [Header("Background Elements")]
+    [SerializeField]
+    private GameObject _sky;
+    [SerializeField]
+    private GameObject _lowerGround;
+
+    [Header("Sprite Renderers")]
     [SerializeField]
     private SpriteRenderer _backgroundSpriteRenderer;
 

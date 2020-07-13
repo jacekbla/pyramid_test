@@ -27,6 +27,7 @@ public class BallController : MonoBehaviour
     private const float _FORCE_INCREASE_WITH_LEVEL = 30.0f;
     private const float _INITIAL_FORCE = 50.0f;
     private const float _INITIAL_FORCE_INCREASE = 40.0f;
+    private const KeyCode _FIRE_KEYBIND = KeyCode.Space;
 
     private float _forceIncrementSpeed = _INITIAL_FORCE_INCREASE;
     private float _force = _INITIAL_FORCE;
@@ -34,6 +35,9 @@ public class BallController : MonoBehaviour
     private Rigidbody2D _rigidbody;
     private Vector3 _originalPos;
 
+    /// <summary>
+    /// Gets original position of Ball game object and its Rigidbody2d. Initializes trajectory.
+    /// </summary>
     private void Awake()
     {
         _originalPos = transform.position;
@@ -46,18 +50,24 @@ public class BallController : MonoBehaviour
         UIController.onRestart += Restart;
     }
 
+    /// <summary>
+    /// Manages ball throws and draws trajectory using TrajectoryController.
+    /// </summary>
     private void Update()
     {
-        if (Input.GetKey(KeyCode.Space) && _force <= _MAX_FORCE && !_ballThrown)
+        if (!_ballThrown)
         {
-            _force += _forceIncrementSpeed * Time.deltaTime;
-            _trajectory.Draw(_rigidbody.mass, _rigidbody.gravityScale, _force, transform.position);
-        }
+            if (Input.GetKey(_FIRE_KEYBIND) && _force <= _MAX_FORCE)
+            {
+                _force += _forceIncrementSpeed * Time.deltaTime;
+                _trajectory.Draw(_rigidbody.mass, _rigidbody.gravityScale, _force, transform.position);
+            }
 
-        if ((Input.GetKeyUp(KeyCode.Space) || _force > _MAX_FORCE) && !_ballThrown)
-        {
-            _rigidbody.AddForce(new Vector2(_force, _force));
-            _ballThrown = true;
+            if ((Input.GetKeyUp(_FIRE_KEYBIND) || _force > _MAX_FORCE))
+            {
+                _rigidbody.AddForce(new Vector2(_force, _force));
+                _ballThrown = true;
+            }
         }
     }
 
@@ -66,6 +76,14 @@ public class BallController : MonoBehaviour
         UIController.onRestart -= Restart;
     }
 
+    /// <summary>
+    /// Manages collision of Ball game object. Because hole collider and ground collider overlap 
+    /// with each other additional checks are necessary.
+    /// If the flag hole is hit onHit event is invoked, force increment speed is increased and 
+    /// next throw is prepared.
+    /// If Ball game objects hits the ground, its Rigidbody2D is frozen and onMiss event is invoked.
+    /// </summary>
+    /// <param name="p_collision"></param>
     private void OnCollisionEnter2D(Collision2D p_collision)
     {
         if (_ballThrown)
@@ -94,6 +112,10 @@ public class BallController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Clears velocity from Ball game object, resets its position, current force and throw state, 
+    /// disables trajectory.
+    /// </summary>
     private void PrepareNextThrow()
     {
         transform.position = _originalPos;
@@ -104,6 +126,10 @@ public class BallController : MonoBehaviour
         _trajectory.Hide();
     }
 
+    /// <summary>
+    /// Called when GameOverRestartButton is clicked. It returns Ball game object to its original 
+    /// state.
+    /// </summary>
     private void Restart()
     {
         PrepareNextThrow();

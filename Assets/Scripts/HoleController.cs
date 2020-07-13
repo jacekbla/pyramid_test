@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// This class is responsible for changing the position of the target flag along the X axis.
+/// This class is responsible for changing the position of target flag along the X axis.
+/// Range of flag positions is declared with sonst values.
 /// It subscribes to events that are invoked when the ball hits the target (BallController) 
 /// and when Restart button is clicked (UIController).
-/// Const values controlling the range of flag position are declared here.
 /// </summary>
 public class HoleController : MonoBehaviour
 {
     private const float _MAX_X = 8.0f;
     private const float _MIN_X = 0.0f;
 
+    /// <summary>
+    /// Randomizes flag position before first throw.
+    /// </summary>
     private void Awake()
     {
         RandomizePosition();
@@ -28,6 +31,9 @@ public class HoleController : MonoBehaviour
         UIController.onRestart -= RandomizePosition;
     }
 
+    /// <summary>
+    /// Ranomizes flag component along the X axis.
+    /// </summary>
     private void RandomizePosition()
     {
         Vector3 position = transform.position;

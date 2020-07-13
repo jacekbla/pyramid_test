@@ -4,10 +4,11 @@ using UnityEngine.UI;
 
 /// <summary>
 /// This class is responsible for User Interface control.
-/// This includes: game over panel displayed when the ball misses the target
-/// and score counter displayed in upper right corner of the screen.
-/// It subscribes to events invoked when ball hits the target or misses it, defined 
+/// This includes: game over panel displayed when the ball misses the target and 
+/// score counter displayed in upper right corner of the screen.
+/// It subscribes to events invoked when ball hits or misses the target, defined 
 /// in BallController.
+/// It contains definition of event invoked when restart button is clicked.
 /// </summary>
 public class UIController : MonoBehaviour
 {
@@ -28,17 +29,18 @@ public class UIController : MonoBehaviour
 
     private ScoreManager _scoreManager;
 
+    /// <summary>
+    /// Initializes UI elements and class variables.
+    /// </summary>
     private void Awake()
     {
         _gameOverPanel.SetActive(false);
 
-        Text[] texts = _gameOverPanel.GetComponentsInChildren<Text>();
-        _gameoverScoreText = texts[1];
-        _gameoverHighscoreText = texts[2];
+        _gameoverScoreText = _gameOverPanel.transform.GetChild(1).GetComponent<Text>();
+        _gameoverHighscoreText = _gameOverPanel.transform.GetChild(2).GetComponent<Text>();
 
         _scoreManager = new ScoreManager();
         _gameoverHighscoreText.text = _GAMEOVER_HIGHTSCORE_CONSTANT_TEXT + _scoreManager.Highscore;
-
     }
 
     private void OnEnable()
@@ -53,6 +55,9 @@ public class UIController : MonoBehaviour
         BallController.onMiss -= ShowGameOverScreen;
     }
 
+    /// <summary>
+    /// This method is assigned to GameOverRestartButton in Inspector.
+    /// </summary>
     public void RestartGame()
     {
         onRestart();
@@ -60,12 +65,20 @@ public class UIController : MonoBehaviour
         _scoreText.text = _INITIAL_SCORE_TEXT;
     }
 
+    /// <summary>
+    /// Called when the ball hits the target. It increments score stored in ScoreManager 
+    /// and updates ScoreText;
+    /// </summary>
     private void UpdateScore()
     {
         _scoreManager.Score++;
         _scoreText.text = _scoreManager.Score.ToString();
     }
 
+    /// <summary>
+    /// Updates GameOverScoreText with current score and checks if highscore should be updated.
+    /// If it does the GameOverHighscore is also updated. Then sets GameOverPanel active.
+    /// </summary>
     private void ShowGameOverScreen()
     {
         _gameoverScoreText.text = _GAMEOVER_SCORE_CONSTANT_TEXT + _scoreManager.Score;
