@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// This class is responsible for preparing, launching and collision detection of the ball 
@@ -10,6 +11,9 @@
 /// </summary>
 public class BallController : MonoBehaviour
 {
+    public static event Action onHit;
+    public static event Action onMiss;
+
     [SerializeField]
     private TrajectoryController _trajectory;
 
@@ -18,12 +22,6 @@ public class BallController : MonoBehaviour
     private BoxCollider2D _groundCollider;
     [SerializeField]
     private BoxCollider2D _holeCollider;
-
-    public delegate void Hit();
-    public static event Hit onHit;
-
-    public delegate void Miss();
-    public static event Miss onMiss;
 
     private const float _MAX_FORCE = 400.0f;
     private const float _FORCE_INCREASE_WITH_LEVEL = 30.0f;
@@ -90,9 +88,8 @@ public class BallController : MonoBehaviour
             }
             else if (p_collision.collider == _groundCollider)
             {
-                onMiss();
-
                 _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
+                onMiss();
             }
         }
     }
@@ -109,13 +106,8 @@ public class BallController : MonoBehaviour
 
     private void Restart()
     {
-        transform.position = _originalPos;
-        _force = _INITIAL_FORCE;
-        _forceIncrementSpeed = _INITIAL_FORCE_INCREASE;
-        _ballThrown = false;
-        _rigidbody.velocity = Vector2.zero;
-        _rigidbody.angularVelocity = 0.0f;
+        PrepareNextThrow();
         _rigidbody.constraints = RigidbodyConstraints2D.None;
-        _trajectory.Hide();
+        _forceIncrementSpeed = _INITIAL_FORCE_INCREASE;
     }
 }

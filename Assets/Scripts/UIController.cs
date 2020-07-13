@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
@@ -10,23 +11,34 @@ using UnityEngine.UI;
 /// </summary>
 public class UIController : MonoBehaviour
 {
+    public static event Action onRestart;
+
     [Header("UI Elements")]
     [SerializeField]
     private GameObject _gameOverPanel;
     [SerializeField]
     private Text _scoreText;
 
-    private const string _HIGHSCORE_FILE_NAME = "hightscore.txt";
+    private Text _gameoverHighscoreText;
+    private Text _gameoverScoreText;
 
-    private FileManager _fileManager = new FileManager();
-    private int _score = 0;
-    
-    public delegate void Restart();
-    public static event Restart onRestart;
+    private const string _INITIAL_SCORE_TEXT = "0";
+    private const string _GAMEOVER_SCORE_CONSTANT_TEXT = "Score: ";
+    private const string _GAMEOVER_HIGHTSCORE_CONSTANT_TEXT = "Best: ";
+
+    private ScoreManager _scoreManager;
 
     private void Awake()
     {
         _gameOverPanel.SetActive(false);
+
+        Text[] texts = _gameOverPanel.GetComponentsInChildren<Text>();
+        _gameoverScoreText = texts[1];
+        _gameoverHighscoreText = texts[2];
+
+        _scoreManager = new ScoreManager();
+        _gameoverHighscoreText.text = _GAMEOVER_HIGHTSCORE_CONSTANT_TEXT + _scoreManager.Highscore;
+
     }
 
     private void OnEnable()
@@ -34,7 +46,7 @@ public class UIController : MonoBehaviour
         BallController.onHit += UpdateScore;
         BallController.onMiss += ShowGameOverScreen;
     }
-    
+
     private void OnDisable()
     {
         BallController.onHit -= UpdateScore;
@@ -44,28 +56,24 @@ public class UIController : MonoBehaviour
     public void RestartGame()
     {
         onRestart();
-        _score = 0;
         _gameOverPanel.SetActive(false);
-        _scoreText.text = "0";
+        _scoreText.text = _INITIAL_SCORE_TEXT;
     }
 
     private void UpdateScore()
     {
-        _score++;
-        _scoreText.text = _score.ToString();
+        _scoreManager.Score++;
+        _scoreText.text = _scoreManager.Score.ToString();
     }
 
     private void ShowGameOverScreen()
     {
-        int bestScore = int.Parse(_fileManager.LoadString(_HIGHSCORE_FILE_NAME));
-        Text[] textArray = _gameOverPanel.GetComponentsInChildren<Text>();
-        textArray[1].text = "Score: " + _score;
-        textArray[2].text = "Best: " + bestScore;
-        _gameOverPanel.SetActive(true);
-
-        if (_score > bestScore)
+        _gameoverScoreText.text = _GAMEOVER_SCORE_CONSTANT_TEXT + _scoreManager.Score;
+        if (_scoreManager.UpdateHighscore())
         {
-            _fileManager.SaveString(_HIGHSCORE_FILE_NAME, _score.ToString());
+            _gameoverHighscoreText.text = _GAMEOVER_HIGHTSCORE_CONSTANT_TEXT + _scoreManager.Highscore;
         }
+
+        _gameOverPanel.SetActive(true);
     }
 }
