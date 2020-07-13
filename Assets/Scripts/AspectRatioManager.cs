@@ -10,12 +10,10 @@ public class AspectRatioManager : MonoBehaviour
     [Header("Game Objects")]
     [SerializeField]
     private GameObject _upperGround;
-
-    [Header("Background Elements")]
-    [SerializeField]
-    private GameObject _sky;
     [SerializeField]
     private GameObject _lowerGround;
+    [SerializeField]
+    private GameObject _sky;
 
     [Header("Sprite Renderers")]
     [SerializeField]
